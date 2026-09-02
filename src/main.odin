@@ -21,7 +21,6 @@ Player_State :: enum {
 
 Level :: struct {
 	platforms: [dynamic]Platform,
-	tile_size: i32,
 }
 
 Platform :: struct {
@@ -29,27 +28,35 @@ Platform :: struct {
 	size: rl.Vector2,
 }
 
-level_draw :: proc() {
-
+level_draw :: proc(level: ^Level) {
+	for platform in level.platforms {
+		rl.DrawRectangle(i32(platform.pos.x * TILE_SIZE), i32(platform.pos.y * TILE_SIZE), i32(platform.size.x * TILE_SIZE), i32(platform.size.y * TILE_SIZE), rl.GRAY)
+	}
 }
 
 level_fabric :: proc() -> Level {
-	level := Level{tile_size = 32}
+	level: Level
 
-	append(&level.platforms, Platform{rect = {0, 2, 4, 5}})
-	platform1 := Platform{rl.Rectangle{}}
+	append(&level.platforms, Platform{pos = {5, 0}, size = {5, 1}})
+
+	return level
 }
 
-camera: rl.Camera2D
-
 main :: proc() {
-	rl.InitWindow(1280, 720, "My Odin + Raylib game")
+	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
 
+	player := Player{pos = {5,1}}
 	level := level_fabric()
+	camera := rl.Camera2D{target = player.pos * TILE_SIZE, offset = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2}, rotation = 0.0, zoom = 1.0}
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground({160, 200, 255, 255})
+
+		rl.BeginMode2D(camera)
+		level_draw(&level)
+		rl.EndMode2D()
+
 		rl.EndDrawing()
 	}
 

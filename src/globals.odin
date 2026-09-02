@@ -1,0 +1,9 @@
+package game
+
+WINDOW_WIDTH :: 1280
+WINDOW_HEIGHT :: 720
+WINDOW_TITLE :: "My Odin + Raylib game"
+
+TILE_SIZE :: 32
+
+TARGET_FPS :: 60
