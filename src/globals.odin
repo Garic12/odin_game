@@ -7,3 +7,5 @@ WINDOW_TITLE :: "My Odin + Raylib game"
 TILE_SIZE :: 32
 
 TARGET_FPS :: 60
+
+PLAYER_SIZE  :: 16.0

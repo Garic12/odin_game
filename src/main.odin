@@ -5,58 +5,54 @@ import rl "vendor:raylib"
 Player :: struct {
 	pos: rl.Vector2,
 	vel: rl.Vector2,
-
-	speed: f32,
-
-	state: Player_State,
-
-	on_ground: bool,
-}
-
-Player_State :: enum {
-	Idle,
-	Running,
-	Jumping,
 }
 
 Level :: struct {
-	platforms: [dynamic]Platform,
+	platforms: [dynamic]rl.Rectangle,
 }
 
-Platform :: struct {
-	pos: rl.Vector2,
-	size: rl.Vector2,
+tile_rect :: proc(x, y, width, height: f32) -> rl.Rectangle {
+	return {x * TILE_SIZE, y * TILE_SIZE, width * TILE_SIZE, height * TILE_SIZE}
 }
 
-level_draw :: proc(level: ^Level) {
-	for platform in level.platforms {
-		rl.DrawRectangle(i32(platform.pos.x * TILE_SIZE), i32(platform.pos.y * TILE_SIZE), i32(platform.size.x * TILE_SIZE), i32(platform.size.y * TILE_SIZE), rl.GRAY)
-	}
+player_rect :: proc(player: Player) -> rl.Rectangle {
+	return {player.pos.x, player.pos.y, PLAYER_SIZE, PLAYER_SIZE}
 }
 
-level_fabric :: proc() -> Level {
-	level: Level
-
-	append(&level.platforms, Platform{pos = {5, 0}, size = {5, 1}})
-
-	return level
-}
 
 main :: proc() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
+	rl.SetTargetFPS(TARGET_FPS);
+	
+	level: Level
+	append(&level.platforms, rl.Rectangle(tile_rect(5, 0, 5, 1)))
+	append(&level.platforms, rl.Rectangle(tile_rect(10, 2, 5, 3)))
+	
+	player := Player{pos = {5 * TILE_SIZE, 1 * TILE_SIZE}}
 
-	player := Player{pos = {5,1}}
-	level := level_fabric()
-	camera := rl.Camera2D{target = player.pos * TILE_SIZE, offset = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2}, rotation = 0.0, zoom = 1.0}
+	camera := rl.Camera2D{
+		target   = player.pos,
+		offset   = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2},
+		rotation = 0.0,
+		zoom     = 2.0,
+	}
 
 	for !rl.WindowShouldClose() {
+		dt := rl.GetFrameTime()
+
 		rl.BeginDrawing()
-		rl.ClearBackground({160, 200, 255, 255})
-
+		rl.ClearBackground(rl.BLUE)
+		
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.BLUE)
 		rl.BeginMode2D(camera)
-		level_draw(&level)
-		rl.EndMode2D()
 
+		for platform in level.platforms {
+			rl.DrawRectangleRec(platform, rl.GRAY)
+		}
+		rl.DrawRectangleRec(player_rect(player), rl.GREEN)
+
+		rl.EndMode2D()
 		rl.EndDrawing()
 	}
 
