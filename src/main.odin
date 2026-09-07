@@ -5,6 +5,10 @@ import rl "vendor:raylib"
 Player :: struct {
 	pos: rl.Vector2,
 	vel: rl.Vector2,
+	
+	speed: f32,
+	
+	is_grounded: bool
 }
 
 Level :: struct {
@@ -28,7 +32,7 @@ main :: proc() {
 	append(&level.platforms, rl.Rectangle(tile_rect(5, 0, 5, 1)))
 	append(&level.platforms, rl.Rectangle(tile_rect(10, 2, 5, 3)))
 	
-	player := Player{pos = {5 * TILE_SIZE, 1 * TILE_SIZE}}
+	player := Player{pos = {5 * TILE_SIZE, 1 * TILE_SIZE}, speed = 60, is_grounded = true}
 
 	camera := rl.Camera2D{
 		target   = player.pos,
@@ -39,9 +43,24 @@ main :: proc() {
 
 	for !rl.WindowShouldClose() {
 		dt := rl.GetFrameTime()
-
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.BLUE)
+		
+		// Input
+		if rl.IsKeyDown(.A) {
+			player.pos.x -= player.speed * dt
+		} else if rl.IsKeyDown(.D) {
+			player.pos.x += player.speed * dt
+		}
+		
+		if player.is_grounded == true {
+			if rl.IsKeyDown(.SPACE) {
+				player.is_grounded = false
+				player.vel.y += 50
+			}
+		} else {
+			// Physics
+			player.vel.y -= GRAVITY * dt
+			player.pos.y -= player.vel.y * dt
+		}
 		
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLUE)
