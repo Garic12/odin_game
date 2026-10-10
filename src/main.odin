@@ -69,7 +69,7 @@ main :: proc() {
 			}
 		}
 
-		// Horizontal movement and collision
+		// Vertical movement and collision
 		player.vel.y += GRAVITY * dt
 		if player.is_grounded && rl.IsKeyPressed(.SPACE) {
 			player.vel.y = -JUMP_SPEED
@@ -84,6 +84,9 @@ main :: proc() {
 			}
 			player.vel.y = 0
 		}
+
+		// Update camera
+		camera.target = player.pos
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLUE)
@@ -100,4 +103,3 @@ main :: proc() {
 
 	rl.CloseWindow()
 }
-
